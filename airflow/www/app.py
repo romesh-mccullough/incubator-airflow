@@ -35,12 +35,13 @@ from airflow import configuration
 def create_app(config=None, testing=False):
     app = Flask(__name__)
     app.secret_key = configuration.get('webserver', 'SECRET_KEY')
-    app.config['LOGIN_DISABLED'] = not configuration.getboolean(
-        'webserver', 'AUTHENTICATE')
+    app.config['LOGIN_DISABLED'] = not configuration.getboolean('webserver', 'AUTHENTICATE')
 
     csrf.init_app(app)
 
     app.config['TESTING'] = testing
+
+    app.config['ADMIN_PATH'] = configuration.get('webserver', 'ADMIN_PATH')
 
     airflow.load_login()
     airflow.login.login_manager.init_app(app)
@@ -62,8 +63,8 @@ def create_app(config=None, testing=False):
 
         admin = Admin(
             app, name='Airflow',
-            static_url_path='/airflow',
-            index_view=views.HomeView(endpoint='', url='/airflow', name="DAGs"),
+            static_url_path=app.config['ADMIN_PATH']
+            index_view=views.HomeView(endpoint='', url=app.config['ADMIN_PATH'], name="DAGs"),
             template_mode='bootstrap3',
         )
         av = admin.add_view
@@ -80,7 +81,7 @@ def create_app(config=None, testing=False):
             models.SlaMiss,
             Session, name="SLA Misses", category="Browse"))
         av(vs.TaskInstanceModelView(models.TaskInstance,
-                                    Session, name="Task Instances", category="Browse"))
+            Session, name="Task Instances", category="Browse"))
         av(vs.LogModelView(
             models.Log, Session, name="Logs", category="Browse"))
         av(vs.JobModelView(
@@ -103,7 +104,7 @@ def create_app(config=None, testing=False):
             url='http://pythonhosted.org/airflow/'))
         admin.add_link(
             base.MenuLink(category='Docs',
-                          name='Github', url='https://github.com/airbnb/airflow'))
+                name='Github',url='https://github.com/airbnb/airflow'))
 
         av(vs.VersionView(name='Version', category="About"))
 
