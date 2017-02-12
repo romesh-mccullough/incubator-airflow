@@ -63,7 +63,7 @@ def create_app(config=None, testing=False):
 
         admin = Admin(
             app, name='Airflow',
-            static_url_path=app.config['ADMIN_PATH']
+            static_url_path=app.config['ADMIN_PATH'],
             index_view=views.HomeView(endpoint='', url=app.config['ADMIN_PATH'], name="DAGs"),
             template_mode='bootstrap3',
         )
