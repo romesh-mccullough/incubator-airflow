@@ -30,6 +30,7 @@ from airflow.www.blueprints import routes
 from airflow import jobs
 from airflow import settings
 from airflow import configuration
+from airflow.www.proxy import ReverseProxied
 
 
 def create_app(config=None, testing=False):
