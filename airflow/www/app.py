@@ -34,6 +34,7 @@ from airflow import configuration
 
 def create_app(config=None, testing=False):
     app = Flask(__name__)
+    app.wsgi_app = ReverseProxied(app.wsgi_app)
     app.secret_key = configuration.get('webserver', 'SECRET_KEY')
     app.config['LOGIN_DISABLED'] = not configuration.getboolean('webserver', 'AUTHENTICATE')
 
